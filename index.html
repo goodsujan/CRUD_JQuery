@@ -55,7 +55,7 @@
           localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
         }
 
-        function render() {
+        function renderTable() {
           const tbody = $('#expenses-table tbody').empty();
           expenses.forEach((exp, idx) => {
             const tr = $('<tr>').attr('data-index', idx)
@@ -88,7 +88,7 @@
             expenses.push(expense);
           }
           save();
-          render();
+          renderTable();
           resetForm();
         });
 
@@ -97,7 +97,7 @@
           if (idx === undefined) return;
           expenses.splice(idx, 1);
           save();
-          render();
+          renderTable();
         });
 
         $('#expenses-table').on('click', '.edit', function () {
@@ -112,7 +112,7 @@
         });
 
         // initial render
-        render();
+        renderTable();
       });
     </script>
   </body>
