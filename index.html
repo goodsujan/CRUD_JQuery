@@ -78,9 +78,21 @@
           const date = $('#date').val();
           const title = $('#title').val().trim();
           const amount = parseFloat($('#amount').val());
-          if (!date || !title || isNaN(amount)) {
-            return alert('Please fill out date, title and a valid amount.');
+
+          // Validation checks
+          if (!date) {
+            return alert('Please select a date.');
           }
+          if (!title) {
+            return alert('Please enter a title.');
+          }
+          if (isNaN(amount)) {
+            return alert('Please enter a valid amount.');
+          }
+          if (amount <= 0) {
+            return alert('Amount must be greater than zero.');
+          }
+
           const expense = { date, title, amount };
           if (editIndex >= 0) {
             expenses[editIndex] = expense;
