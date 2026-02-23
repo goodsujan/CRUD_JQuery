@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Expense Tracker</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+        margin: 0;
+        padding: 20px;
+      }
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 20px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      }
+      .row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .row > * {
+        flex: 1;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 16px;
+      }
+      th,
+      td {
+        padding: 8px 10px;
+        border: 1px solid #ddd;
+        text-align: left;
+      }
+      .actions {
+        width: 140px;
+      }
+      button {
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Expense Tracker</h1>
+
+      <form id="expense-form">
+        <div class="row">
+          <input type="text" id="desc" placeholder="Description" required />
+          <input
+            type="number"
+            id="amount"
+            placeholder="Amount"
+            step="0.01"
+            required
+          />
+          <input type="date" id="date" required />
+          <button type="submit" id="add-expense">Add Expense</button>
+        </div>
+      </form>
+
+      <table id="expenses-table">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>Date</th>
+            <th class="actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Expenses will be rendered here -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- jQuery CDN -->
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJ+Y5m6Q6v3bZ8T2n5l9H7b4x3Y9x3qv9Z7a8="
+      crossorigin="anonymous"
+    ></script>
+
+    <script>
+      $(function () {
+        // Placeholder for future CRUD logic using jQuery
+        $("#expense-form").on("submit", function (e) {
+          e.preventDefault();
+          const desc = $("#desc").val();
+          const amount = parseFloat($("#amount").val()).toFixed(2);
+          const date = $("#date").val();
+          const row = $("<tr>")
+            .append($("<td>").text(desc))
+            .append($("<td>").text(amount))
+            .append($("<td>").text(date))
+            .append(
+              $("<td>").html(
+                '<button class="edit">Edit</button> <button class="delete">Delete</button>',
+              ),
+            );
+          $("#expenses-table tbody").append(row);
+          this.reset();
+        });
+
+        $("#expenses-table").on("click", ".delete", function () {
+          $(this).closest("tr").remove();
+        });
+
+        // Edit handler placeholder
+        $("#expenses-table").on("click", ".edit", function () {
+          const tr = $(this).closest("tr");
+          const desc = tr.find("td").eq(0).text();
+          const amount = tr.find("td").eq(1).text();
+          const date = tr.find("td").eq(2).text();
+          $("#desc").val(desc);
+          $("#amount").val(amount);
+          $("#date").val(date);
+          tr.remove();
+        });
+      });
+    </script>
+  </body>
+</html>
