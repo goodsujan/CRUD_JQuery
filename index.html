@@ -5,11 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Expense Tracker</title>
     <link rel="stylesheet" href="styles.css" />
-      </head>
-      <body>
-        <div class="container">
-          <h1>Expense Tracker</h1>
-          <form id="expense-form">
+  </head>
+  <body>
+    <!-- Main Container -->
+    <div class="container">
+      <h1>Expense Tracker</h1>
+
+      <!-- Expense Input Form -->
+      <form id="expense-form">
+        <div class="row">
           <input type="date" id="date" required />
           <input type="text" id="title" placeholder="Title" required />
           <input
@@ -23,6 +27,7 @@
         </div>
       </form>
 
+      <!-- Expense Table -->
       <table id="expenses-table">
         <thead>
           <tr>
@@ -33,10 +38,11 @@
           </tr>
         </thead>
         <tbody>
-          <!-- Expenses will be rendered here -->
+          <!-- Expenses dynamically rendered here -->
         </tbody>
       </table>
 
+      <!-- Total Expenses Section -->
       <div class="total-section">
         <strong>Total Expenses:</strong> $<span id="total-amount">0.00</span>
       </div>
@@ -50,91 +56,160 @@
     ></script>
 
     <script>
+      /**
+       * Expense Tracker Application
+       * CRUD operations with localStorage persistence
+       */
       $(function () {
-        const STORAGE_KEY = 'expenses_v1';
-        let expenses = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        // ==================== Configuration ====================
+        const STORAGE_KEY = "expenses_v1";
+        let expenses = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
         let editIndex = -1;
 
+        // ==================== Core Functions ====================
+
+        /**
+         * Save expense array to localStorage
+         */
         function save() {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
         }
 
+        /**
+         * Render expense table dynamically
+         * Clears tbody, loops through expenses array, creates rows with Edit/Delete buttons
+         */
         function renderTable() {
-          const tbody = $('#expenses-table tbody').empty();
+          const tbody = $("#expenses-table tbody").empty();
           expenses.forEach((exp, idx) => {
-            const tr = $('<tr>').attr('data-index', idx)
-              .append($('<td>').text(exp.date))
-              .append($('<td>').text(exp.title))
-              .append($('<td>').text(Number(exp.amount).toFixed(2)))
-              .append($('<td>').addClass('actions').html('<button class="edit">Edit</button> <button class="delete">Delete</button>'));
+            const tr = $("<tr>")
+              .attr("data-index", idx)
+              .append($("<td>").text(exp.date))
+              .append($("<td>").text(exp.title))
+              .append($("<td>").text(Number(exp.amount).toFixed(2)))
+              .append(
+                $("<td>")
+                  .addClass("actions")
+                  .html(
+                    '<button class="edit">Edit</button> <button class="delete">Delete</button>',
+                  ),
+              );
             tbody.append(tr);
           });
         }
 
-        function resetForm() {
-          $('#expense-form')[0].reset();
-          editIndex = -1;
-          $('#add-expense').text('Add Expense');
-        }
-
+        /**
+         * Calculate and display total expenses
+         * Sums all amounts and updates #total-amount element
+         */
         function calculateTotal() {
-          const total = expenses.reduce((sum, exp) => sum + Number(exp.amount), 0);
-          $('#total-amount').text(total.toFixed(2));
+          const total = expenses.reduce(
+            (sum, exp) => sum + Number(exp.amount),
+            0,
+          );
+          $("#total-amount").text(total.toFixed(2));
         }
 
-        $('#expense-form').on('submit', function (e) {
-          e.preventDefault();
-          const date = $('#date').val();
-          const title = $('#title').val().trim();
-          const amount = parseFloat($('#amount').val());
+        /**
+         * Reset form to initial state
+         * Clears inputs, resets edit state, restores button text
+         */
+        function resetForm() {
+          $("#expense-form")[0].reset();
+          editIndex = -1;
+          $("#add-expense").text("Add Expense");
+        }
 
-          // Validation checks
+        /**
+         * Validate form input
+         * Checks: date, title, valid amount, positive amount
+         * @returns {boolean} true if valid, false otherwise
+         */
+        function validateForm(date, title, amount) {
           if (!date) {
-            return alert('Please select a date.');
+            alert("Please select a date.");
+            return false;
           }
           if (!title) {
-            return alert('Please enter a title.');
+            alert("Please enter a title.");
+            return false;
           }
           if (isNaN(amount)) {
-            return alert('Please enter a valid amount.');
+            alert("Please enter a valid amount.");
+            return false;
           }
           if (amount <= 0) {
-            return alert('Amount must be greater than zero.');
+            alert("Amount must be greater than zero.");
+            return false;
           }
+          return true;
+        }
 
+        // ==================== Event Handlers ====================
+
+        /**
+         * Form submission handler
+         * Creates new expense or updates existing one based on editIndex
+         */
+        $("#expense-form").on("submit", function (e) {
+          e.preventDefault();
+
+          const date = $("#date").val();
+          const title = $("#title").val().trim();
+          const amount = parseFloat($("#amount").val());
+
+          // Validate input
+          if (!validateForm(date, title, amount)) return;
+
+          // Create or update expense
           const expense = { date, title, amount };
           if (editIndex >= 0) {
-            expenses[editIndex] = expense;
+            expenses[editIndex] = expense; // Update mode
           } else {
-            expenses.push(expense);
+            expenses.push(expense); // Add mode
           }
+
+          // Update UI and persist
           save();
           renderTable();
           calculateTotal();
           resetForm();
         });
 
-        $('#expenses-table').on('click', '.delete', function () {
-          const idx = $(this).closest('tr').data('index');
+        /**
+         * Delete button click handler
+         * Removes expense by index from array, saves, and re-renders
+         */
+        $("#expenses-table").on("click", ".delete", function () {
+          const idx = $(this).closest("tr").data("index");
           if (idx === undefined) return;
+
           expenses.splice(idx, 1);
           save();
           renderTable();
           calculateTotal();
         });
 
-        $('#expenses-table').on('click', '.edit', function () {
-          const idx = $(this).closest('tr').data('index');
+        /**
+         * Edit button click handler
+         * Populates form with expense data and switches to update mode
+         */
+        $("#expenses-table").on("click", ".edit", function () {
+          const idx = $(this).closest("tr").data("index");
           const exp = expenses[idx];
           if (!exp) return;
-          $('#date').val(exp.date);
-          $('#title').val(exp.title);
-          $('#amount').val(exp.amount);
+
+          // Populate form
+          $("#date").val(exp.date);
+          $("#title").val(exp.title);
+          $("#amount").val(exp.amount);
+
+          // Switch to update mode
           editIndex = idx;
-          $('#add-expense').text('Update Expense');
+          $("#add-expense").text("Update Expense");
         });
 
-        // initial render
+        // ==================== Initialization ====================
         renderTable();
         calculateTotal();
       });
