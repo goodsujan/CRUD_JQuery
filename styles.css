@@ -72,3 +72,6 @@ tbody tr:hover{background:rgba(79,70,229,0.03)}
 
 /* small helper spacing */
 .muted{color:var(--muted);font-size:0.9rem}
+
+/* total section */
+.total-section{margin-top:16px;padding:12px;background:#fbfbff;border-radius:8px;text-align:right;font-size:1.1rem;color:var(--accent);font-weight:600}

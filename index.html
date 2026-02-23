@@ -36,6 +36,10 @@
           <!-- Expenses will be rendered here -->
         </tbody>
       </table>
+
+      <div class="total-section">
+        <strong>Total Expenses:</strong> $<span id="total-amount">0.00</span>
+      </div>
     </div>
 
     <!-- jQuery CDN -->
@@ -73,6 +77,11 @@
           $('#add-expense').text('Add Expense');
         }
 
+        function calculateTotal() {
+          const total = expenses.reduce((sum, exp) => sum + Number(exp.amount), 0);
+          $('#total-amount').text(total.toFixed(2));
+        }
+
         $('#expense-form').on('submit', function (e) {
           e.preventDefault();
           const date = $('#date').val();
@@ -101,6 +110,7 @@
           }
           save();
           renderTable();
+          calculateTotal();
           resetForm();
         });
 
@@ -110,6 +120,7 @@
           expenses.splice(idx, 1);
           save();
           renderTable();
+          calculateTotal();
         });
 
         $('#expenses-table').on('click', '.edit', function () {
@@ -125,6 +136,7 @@
 
         // initial render
         renderTable();
+        calculateTotal();
       });
     </script>
   </body>
