@@ -5,54 +5,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Expense Tracker</title>
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        background: #f5f5f5;
-        margin: 0;
-        padding: 20px;
-      }
-      .container {
-        max-width: 900px;
-        margin: 0 auto;
-        background: #fff;
-        padding: 20px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-      }
-      .row {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-      }
-      .row > * {
-        flex: 1;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 16px;
-      }
-      th,
-      td {
-        padding: 8px 10px;
-        border: 1px solid #ddd;
-        text-align: left;
-      }
-      .actions {
-        width: 140px;
-      }
-      button {
-        padding: 8px 12px;
-        cursor: pointer;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <h1>Expense Tracker</h1>
+          body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+          }
+          .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>Expense Tracker</h1>
+          <form id="expense-form">
+            <script>
+          $(function () {
+            // Basic CRUD logic using jQuery (in-memory)
+            $("#expense-form").on("submit", function (e) {
+              e.preventDefault();
+              const date = $("#date").val();
+              const title = $("#title").val();
+              const amount = parseFloat($("#amount").val()).toFixed(2);
+              const row = $("<tr>")
+                .append($("<td>").text(date))
+                .append($("<td>").text(title))
+                .append($("<td>").text(amount))
+                .append(
+                  $("<td>").html('<button class="edit">Edit</button> <button class="delete">Delete</button>'),
+                );
+              $("#expenses-table tbody").append(row);
+              this.reset();
+            });
 
-      <form id="expense-form">
-        <div class="row">
-          <input type="text" id="desc" placeholder="Description" required />
+            $("#expenses-table").on("click", ".delete", function () {
+              $(this).closest("tr").remove();
+            });
+
+            // Edit handler: populate inputs and remove the row
+            $("#expenses-table").on("click", ".edit", function () {
+              const tr = $(this).closest("tr");
+              const date = tr.find("td").eq(0).text();
+              const title = tr.find("td").eq(1).text();
+              const amount = tr.find("td").eq(2).text();
+              $("#date").val(date);
+              $("#title").val(title);
+              $("#amount").val(amount);
+              tr.remove();
+            });
+          });
+        </script>
+          <input type="date" id="date" required />
+          <input type="text" id="title" placeholder="Title" required />
           <input
             type="number"
             id="amount"
@@ -60,7 +69,6 @@
             step="0.01"
             required
           />
-          <input type="date" id="date" required />
           <button type="submit" id="add-expense">Add Expense</button>
         </div>
       </form>
@@ -68,9 +76,9 @@
       <table id="expenses-table">
         <thead>
           <tr>
-            <th>Description</th>
-            <th>Amount</th>
             <th>Date</th>
+            <th>Title</th>
+            <th>Amount</th>
             <th class="actions">Actions</th>
           </tr>
         </thead>
